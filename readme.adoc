@@ -1,0 +1,11 @@
+# Broken link service
+
+Returns
+
+```
+{
+  'workingLinks':'100',
+  'brokenLinks':'10',
+  'redirectedLinks':'5'
+}
+```
