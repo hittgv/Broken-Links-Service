@@ -5,19 +5,51 @@ buildscript {
   }
   dependencies {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.1"
+    classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
   }
 }
 
+apply plugin: 'java'
+apply plugin: 'application'
 apply plugin: 'kotlin'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+sourceCompatibility = '1.8'
+mainClassName = 'io.vertx.core.Launcher'
+def mainVerticleName = 'io.restall.hittgv.broken.MainVerticle'
 
 repositories {
   jcenter()
+  maven {
+    url "http://dl.bintray.com/cy6ergn0m/maven"
+  }
 }
 
 dependencies {
+  compile "io.vertx:vertx-core:3.4.1"
+  compile "io.vertx:vertx-web:3.4.1"
+
   compile "org.jetbrains.kotlin:kotlin-stdlib:1.1.1"
-
-  compile "io.vertx:vertx-core:3.3.0"
-  compile "io.vertx:vertx-jdbc-client:3.3.0"
-
+  compile "org.jetbrains.kotlin:kotlin-runtime:1.1.1"
 }
+
+run {
+  args = ['run', mainVerticleName,
+          "--launcher-class=$mainClassName",
+          "--redeploy=src/**/*.*",
+          "--on-redeploy=./gradlew classes"
+  ]
+}
+
+shadowJar {
+  baseName = 'app'
+  classifier = 'shadow'
+
+  manifest {
+    attributes 'Main-Verticle': mainVerticleName
+  }
+  mergeServiceFiles {
+    include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+  }
+}
+
