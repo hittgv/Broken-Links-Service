@@ -9,6 +9,7 @@ import javaslang.jackson.datatype.JavaslangModule;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.DefaultAsyncHttpClient;
+import org.asynchttpclient.DefaultAsyncHttpClientConfig;
 import org.asynchttpclient.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -21,7 +22,14 @@ public class App {
     public static void main(String[] args) {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaslangModule());
-        AsyncHttpClient httpClient = new DefaultAsyncHttpClient();
+        AsyncHttpClient httpClient = new DefaultAsyncHttpClient(
+                new DefaultAsyncHttpClientConfig.Builder()
+                        .setUserAgent("Broken-Link-Checker conor@restall.io")
+                        .setConnectTimeout(5000)
+                        .setReadTimeout(1000)
+                        .setIoThreadsCount(200).build()
+        );
+
         String[] schemes = {"http", "https"};
         UrlValidator urlValidator = new UrlValidator(schemes);
 
@@ -38,10 +46,10 @@ public class App {
                     .map(url -> httpClient.prepareGet(url)
                             .execute()
                             .toCompletableFuture()
-                            .exceptionally(e -> null)
                             .thenApply(Response::getStatusCode)
                             .thenApply(State::fromStatusCode)
-                            .thenApply(List::of))
+                            .thenApply(List::of)
+                            .exceptionally(e -> List.of(State.FAIL)))
                     .reduce((a, b) -> a.thenCombineAsync(b, List::appendAll))
                     .thenApply(it -> it.groupBy(z -> z))
                     .get()
