@@ -1,7 +1,5 @@
 package io.restall.hittgv.broken;
 
-import com.sun.org.apache.regexp.internal.RE;
-
 public enum State {
     SUCCESS, FAIL, REDIRECT;
 
@@ -17,4 +15,4 @@ public enum State {
         }
         return SUCCESS;
     }
-    }
+}
