@@ -15,6 +15,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import static java.lang.System.*;
 import static spark.Spark.*;
 
 public class App {
@@ -32,6 +33,8 @@ public class App {
 
         String[] schemes = {"http", "https"};
         UrlValidator urlValidator = new UrlValidator(schemes);
+
+        port(Integer.parseInt(getenv().get("PORT")));
 
         post("/", (req, res) -> {
             Body body = objectMapper.readValue(req.bodyAsBytes(), Body.class);

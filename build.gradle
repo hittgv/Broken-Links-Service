@@ -31,3 +31,7 @@ dependencies {
     compile 'org.jsoup:jsoup:1.10.2'
     compile 'com.sparkjava:spark-core:2.3'
 }
+
+task stage() {
+    dependsOn shadowJar
+}
