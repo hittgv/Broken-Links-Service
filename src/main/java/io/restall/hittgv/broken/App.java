@@ -2,6 +2,7 @@ package io.restall.hittgv.broken;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javaslang.Tuple;
+import javaslang.collection.HashMap;
 import javaslang.collection.List;
 import javaslang.collection.Map;
 import javaslang.collection.Stream;
@@ -14,6 +15,7 @@ import org.asynchttpclient.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import spark.Request;
 
 import static java.lang.System.*;
 import static spark.Spark.*;
@@ -36,7 +38,7 @@ public class App {
 
         port(Integer.parseInt(getenv().get("PORT")));
 
-        post("/", (req, res) -> {
+        post("/", (Request req, spark.Response res) -> {
             Body body = objectMapper.readValue(req.bodyAsBytes(), Body.class);
 
             Document doc = Jsoup.parse(body.getHtml(), body.getUrl());
@@ -58,7 +60,12 @@ public class App {
                     .get()
                     .map((a,b) -> Tuple.of(a, b.size()));
 
-            return objectMapper.writeValueAsString(links);
+            Map<State, Integer> links2 = HashMap.empty();
+            links2 = links2.put(State.SUCCESS, links.get(State.SUCCESS).getOrElse(0));
+            links2 = links2.put(State.REDIRECT, links.get(State.REDIRECT).getOrElse(0));
+            links2 = links2.put(State.FAIL, links.get(State.FAIL).getOrElse(0));
+
+            return objectMapper.writeValueAsString(links2);
         });
 
     }
