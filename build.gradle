@@ -13,7 +13,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 sourceCompatibility = '1.8'
 
-mainClassName='io.restall.hittqv.broken.App'
+mainClassName='io.restall.hittgv.broken.App'
 
 repositories {
     jcenter()
